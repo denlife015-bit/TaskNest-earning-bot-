@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskNest earning bot</title>
+    <!-- Ad Code SDK -->
+    <script src='//libtl.com/sdk.js' data-zone='10985727' data-sdk='show_10985727'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; }
+        .dark-bg { background-color: #121212; }
+        .card-bg { background-color: #1e1e1e; }
+        .text-accent { color: #ff8c00; }
+        .btn-accent { background-color: #ff8c00; color: #121212; font-weight: bold; transition: all 0.2s; }
+        .btn-accent:hover { background-color: #e67e00; }
+        .btn-accent:active { transform: scale(0.95); }
+        .input-field { background-color: #2c2c2c; border: 1px solid #444; color: white; }
+        .main-page { display: none; }
+        .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
+        .sub-page { display: none; }
+        .sub-page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .bottom-nav a.active { color: #ff8c00; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="max-w-md mx-auto">
+
+<!-- App Loader -->
+<div id="loader" class="fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
+</div>
+
+<!-- Authentication Section -->
+<div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page">
+    <h1 class="text-3xl font-bold text-center mb-2 text-accent">TaskNest earning bot</h1>
+    <div id="auth-container" class="mt-8">
+        <div id="login-view">
+            <input id="login-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-4">
+            <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
+            <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Login</button>
+            <p class="text-center text-gray-400">Don't have an account? <a href="#" id="show-signup" class="font-semibold text-accent">Sign Up</a></p>
+        </div>
+        <div id="signup-view" class="hidden">
+            <input id="signup-name" type="text" placeholder="Full Name" class="w-full p-3 rounded-lg input-field mb-4">
+            <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-4">
+            <input id="signup-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
+            <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Sign Up</button>
+            <p class="text-center text-gray-400">Already have an account? <a href="#" id="show-login" class="font-semibold text-accent">Login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Main App Container -->
+<div id="app-container" class="min-h-screen flex-col main-page">
+    <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg border-b border-gray-800">
+        <h1 class="text-lg font-bold text-accent">TaskNest earning bot</h1>
+        <div class="flex items-center space-x-4">
+            <div id="notification-bell" class="relative cursor-pointer" onclick="navigateTo('notifications-page')">
+                <i data-lucide="bell" class="w-6 h-6"></i>
+                <div id="notification-dot" class="hidden absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-black"></div>
+            </div>
+            <i data-lucide="user" class="w-6 h-6 cursor-pointer" onclick="navigateTo('profile-page')"></i>
+        </div>
+    </header>
+
+    <main class="flex-grow pb-20">
+        <!-- Home Page -->
+        <div id="home-page" class="p-4 space-y-6 sub-page">
+            <div class="card-bg p-5 rounded-xl flex items-center justify-between border border-gray-800 shadow-lg">
+                <div>
+                    <p class="text-gray-400 text-xs uppercase tracking-wider">Total Balance</p>
+                    <p class="text-3xl font-bold mt-1"><span id="coin-balance">0</span> <span class="text-sm text-gray-400">Coins</span></p>
+                </div>
+                <button onclick="navigateTo('wallet-page')" class="bg-white text-black font-bold px-5 py-2.5 rounded-lg text-sm">Withdraw</button>
+            </div>
+
+            <!-- Binance Task Section -->
+            <section id="binance-section">
+                <h2 class="text-lg font-semibold mb-3">Special Offers</h2>
+                <div class="card-bg p-4 rounded-xl flex items-center justify-between border border-yellow-600/50 bg-gradient-to-r from-yellow-900/20 to-transparent">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-3xl">🪙</span>
+                        <div>
+                            <h3 class="font-bold text-sm">Binance Box Claim</h3>
+                            <p id="binance-text" class="text-xs text-yellow-500">২৫ থেকে ৫০০ কয়েন পর্যন্ত পাওয়ার সুযোগ!</p>
+                        </div>
+                    </div>
+                    <button id="binance-btn" class="bg-yellow-500 text-black px-5 py-2 rounded-lg text-xs font-bold shadow-lg" onclick="claimBinanceReward()">Claim Now</button>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Daily Tasks</h2>
+                    <p class="text-xs text-gray-400">Ads Limit: <span id="ads-left-count">0</span>/100</p>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="card-bg p-4 rounded-xl flex items-center justify-between border border-gray-800">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl">📺</span>
+                            <div>
+                                <h3 class="font-bold text-sm">Watch Video Ad</h3>
+                                <p class="text-xs text-accent">Earn: 5 - 15 Points</p>
+                            </div>
+                        </div>
+                        <button class="btn-accent px-5 py-2 rounded-lg text-xs" onclick="claimReward('ad1')">Start</button>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl flex items-center justify-between border border-gray-800">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl">🎯</span>
+                            <div>
+                                <h3 class="font-bold text-sm">Lucky Task</h3>
+                                <p class="text-xs text-accent">Earn: 5 - 15 Points</p>
+                            </div>
+                        </div>
+                        <button class="btn-accent px-5 py-2 rounded-lg text-xs" onclick="claimReward('ad2')">Play</button>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl flex items-center justify-between border border-gray-800">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl">🎥</span>
+                            <div>
+                                <h3 class="font-bold text-sm">Mega Video</h3>
+                                <p class="text-xs text-accent">Earn: 5 - 15 Points</p>
+                            </div>
+                        </div>
+                        <button class="btn-accent px-5 py-2 rounded-lg text-xs" onclick="claimReward('ad3')">Watch</button>
+                    </div>
+                    <div class="card-bg p-4 rounded-xl flex items-center justify-between border border-gray-800">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-3xl">🎮</span>
+                            <div>
+                                <h3 class="font-bold text-sm">Mini Game Ad</h3>
+                                <p class="text-xs text-accent">Earn: 5 - 15 Points</p>
+                            </div>
+                        </div>
+                        <button class="btn-accent px-5 py-2 rounded-lg text-xs" onclick="claimReward('ad4')">Start</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Wallet Page -->
+        <div id="wallet-page" class="p-4 space-y-6 sub-page">
+            <h2 class="text-xl font-bold text-center">My Wallet</h2>
+            <div class="card-bg p-5 rounded-xl border border-gray-800">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-400">Exchange Rate</p>
+                    <p class="text-lg font-bold text-accent">1000 Coins = 10 ৳</p>
+                    <div class="mt-2 bg-gray-900 p-2 rounded-lg inline-block">
+                        <p class="text-xs text-orange-400">⚠️ Min Withdrawal: 5000 Coins</p>
+                    </div>
+                    <p class="text-xs text-green-500 mt-2">🎁 First Withdraw Bonus: 200 - 300 Coins</p>
+                </div>
+                
+                <label class="text-sm text-gray-400 block mb-2">Withdraw Method</label>
+                <select id="withdraw-method" class="w-full p-3 rounded-lg input-field mb-4">
+                    <option value="Nagad">Nagad (নগদ)</option>
+                    <option value="bKash">bKash (বিকাশ)</option>
+                </select>
+
+                <label class="text-sm text-gray-400 block mb-2">Amount (Coins)</label>
+                <input id="withdraw-amount" type="number" placeholder="Min 5000 Coins" class="w-full p-3 rounded-lg input-field mb-4">
+                
+                <label class="text-sm text-gray-400 block mb-2">Wallet Number</label>
+                <input id="payment-detail-input" type="text" placeholder="Enter number" class="w-full p-3 rounded-lg input-field mb-6">
+                
+                <button id="withdraw-btn" class="w-full p-4 rounded-lg btn-accent uppercase tracking-widest">Request Withdrawal</button>
+            </div>
+        </div>
+
+        <!-- Refer Page -->
+        <div id="refer-page" class="p-4 space-y-6 sub-page text-center">
+            <h2 class="text-xl font-bold">Refer & Earn</h2>
+            <div class="card-bg p-8 rounded-xl border border-gray-800">
+                <p class="text-accent text-3xl mb-4">🎁</p>
+                <p class="text-sm text-gray-400 mb-2">Get 50 - 100 Coins per referral</p>
+                <p class="text-xs text-gray-500 mb-6">+ 2% Referral Earning Bonus!</p>
+                <div class="bg-black bg-opacity-30 p-4 rounded-lg border border-dashed border-gray-600 mb-4">
+                    <span id="referral-code" class="text-2xl font-bold tracking-widest">LOADING...</span>
+                </div>
+                <button class="w-full p-3 rounded-lg btn-accent">Copy Code</button>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile-page" class="p-4 space-y-6 sub-page">
+            <div class="flex flex-col items-center">
+                <div class="w-24 h-24 bg-gradient-to-tr from-orange-500 to-yellow-500 rounded-full flex items-center justify-center text-4xl font-bold mb-4">T</div>
+                <h2 id="profile-name" class="text-2xl font-bold text-accent">TaskNest Bot User</h2>
+                <p id="profile-email" class="text-gray-400 mb-8">user@email.com</p>
+                <button id="logout-btn" class="w-full p-4 rounded-xl bg-red-600 bg-opacity-20 text-red-500 border border-red-500 font-bold">Logout</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto grid grid-cols-4 items-center text-center py-3 card-bg border-t border-gray-800">
+        <a href="#" class="nav-link" data-page="home-page"><i data-lucide="home" class="mx-auto w-6 h-6"></i><span class="text-[10px] mt-1">Home</span></a>
+        <a href="#" class="nav-link" data-page="wallet-page"><i data-lucide="wallet" class="mx-auto w-6 h-6"></i><span class="text-[10px] mt-1">Wallet</span></a>
+        <a href="#" class="nav-link" data-page="refer-page"><i data-lucide="users" class="mx-auto w-6 h-6"></i><span class="text-[10px] mt-1">Refer</span></a>
+        <a href="#" class="nav-link" data-page="profile-page"><i data-lucide="user" class="mx-auto w-6 h-6"></i><span class="text-[10px] mt-1">Profile</span></a>
+    </nav>
+</div>
+
+<!-- Custom Alert -->
+<div id="custom-alert" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-6">
+    <div class="bg-gray-800 rounded-2xl p-6 w-full max-w-xs text-center border border-gray-700">
+        <div id="alert-icon" class="text-4xl mb-3">✔️</div>
+        <p id="alert-message" class="mb-6 text-white font-medium"></p>
+        <button onclick="closeAlert()" class="btn-accent w-full py-3 rounded-xl">OK</button>
+    </div>
+</div>
+
+<script type="module">
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDtuiLq65D3xCjMfKK3BTPJXSuT6GQKC8Q",
+        authDomain: "tasknest-earning-bot.firebaseapp.com",
+        projectId: "tasknest-earning-bot",
+        storageBucket: "tasknest-earning-bot.firebasestorage.app",
+        messagingSenderId: "558599672206",
+        appId: "1:558599672206:web:a86365f7f4bbc1654454df"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userData = null;
+
+    window.showAlert = (msg, icon = '✔️') => {
+        document.getElementById('alert-message').textContent = msg;
+        document.getElementById('alert-icon').textContent = icon;
+        document.getElementById('custom-alert').classList.remove('hidden');
+    };
+
+    window.closeAlert = () => {
+        document.getElementById('custom-alert').classList.add('hidden');
+    };
+
+    window.navigateTo = (pageId) => {
+        document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if(link.getAttribute('data-page') === pageId) link.classList.add('active');
+        });
+    };
+
+    window.claimBinanceReward = async () => {
+        if (!auth.currentUser || !userData) return;
+        if (userData.binanceClaimed === true) {
+            showAlert("You have already claimed this reward!", "❌");
+            return;
+        }
+        window.open('https://app.binance.com/uni-qr/PAigYe9K?utm_medium=web_share_copy', '_blank');
+        const rewardPoints = 30;
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const newBalance = (userData.balance || 0) + rewardPoints;
+        try {
+            await updateDoc(userRef, { balance: newBalance, binanceClaimed: true });
+            userData.balance = newBalance;
+            userData.binanceClaimed = true;
+            updateUI();
+            showAlert(`বাইনান্স ভিজিট করার জন্য আপনি ৩০ কয়েন পেয়েছেন!`, "🔥");
+        } catch (error) { console.error(error); }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        const loader = document.getElementById('loader');
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                userData = userSnap.data();
+            } else {
+                userData = {
+                    uid: user.uid,
+                    name: user.displayName || "User",
+                    email: user.email,
+                    balance: 50,
+                    dailyAdCount: 0,
+                    isFirstWithdraw: true,
+                    binanceClaimed: false,
+                    referralCode: Math.random().toString(36).substring(7).toUpperCase()
+                };
+                await setDoc(userRef, userData);
+            }
+            document.getElementById('auth-section').classList.remove('active');
+            document.getElementById('app-container').classList.add('active');
+            navigateTo('home-page'); // স্ক্রিনশটের সমস্যা সমাধান: লগইনের পর সরাসরি হোম পেজ
+            updateUI();
+        } else {
+            document.getElementById('app-container').classList.remove('active');
+            document.getElementById('auth-section').classList.add('active');
+        }
+        loader.style.display = 'none';
+        lucide.createIcons();
+    });
+
+    function updateUI() {
+        if(!userData) return;
+        document.getElementById('coin-balance').textContent = userData.balance;
+        document.getElementById('profile-email').textContent = userData.email;
+        document.getElementById('referral-code').textContent = userData.referralCode;
+        document.getElementById('ads-left-count').textContent = (userData.dailyAdCount || 0);
+
+        const bBtn = document.getElementById('binance-btn');
+        const bText = document.getElementById('binance-text');
+        if (userData.binanceClaimed) {
+            bBtn.textContent = "Claimed";
+            bBtn.classList.replace('bg-yellow-500', 'bg-gray-600');
+            bBtn.style.pointerEvents = 'none';
+            bText.textContent = "আপনি এই অফারটি গ্রহণ করেছেন।";
+        }
+    }
+
+    window.claimReward = async (type) => {
+        if(userData.dailyAdCount >= 100) return showAlert("Limit reached!", "❌");
+        if (typeof show_10985727 === 'function') {
+            show_10985727().then(async () => {
+                const randomPoints = Math.floor(Math.random() * 11) + 5;
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const newBalance = (userData.balance || 0) + randomPoints;
+                const newCount = (userData.dailyAdCount || 0) + 1;
+                await updateDoc(userRef, { balance: newBalance, dailyAdCount: newCount });
+                userData.balance = newBalance;
+                userData.dailyAdCount = newCount;
+                updateUI();
+                showAlert(`Success! You earned ${randomPoints} coins.`);
+            });
+        }
+    };
+
+    document.getElementById('login-btn').onclick = () => {
+        signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e => showAlert(e.message, "❌"));
+    };
+    document.getElementById('signup-btn').onclick = () => {
+        createUserWithEmailAndPassword(auth, document.getElementById('signup-email').value, document.getElementById('signup-password').value).catch(e => showAlert(e.message, "❌"));
+    };
+    document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+    document.getElementById('show-signup').onclick = () => {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('signup-view').classList.remove('hidden');
+    };
+    document.getElementById('show-login').onclick = () => {
+        document.getElementById('signup-view').classList.add('hidden');
+        document.getElementById('login-view').classList.remove('hidden');
+    };
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+             link.onclick = (e) => { e.preventDefault(); navigateTo(link.getAttribute('data-page')); };
+    });
+</script>
+</body>
+</html>
